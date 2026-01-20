@@ -4,24 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingLeft="8dp"
+    android:paddingTop="6dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/ivAvatar"
-            android:layout_width="@dimen/base_margin_x4"
-            android:layout_height="@dimen/base_margin_x4"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="8dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_default_avatar"
-            android:visibility="invisible" />
-
-        <LinearLayout
-            android:layout_width="@dimen/base_margin_half"
-            android:layout_height="match_parent" />
+            android:visibility="visible" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -43,100 +44,99 @@
                 android:id="@+id/tvNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
-                android:textSize="@dimen/size_text_action" />
-
-
-
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
+                android:textSize="12sp" />
 
         </LinearLayout>
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="0dp"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal">
 
         <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/llDecline"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_height="32dp"
+            android:background="@drawable/rounded_button_decline"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
             android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="6dp"
+                android:src="@drawable/ic_decline"
+                android:tint="@android:color/white"
+                app:tint="@android:color/white"
+                tools:ignore="UseAppTint" />
 
-            <LinearLayout
-                android:id="@+id/llDecline"
-                android:layout_width="@dimen/base_margin_x4"
-                android:layout_height="@dimen/base_margin_x4"
-                android:background="@drawable/rounded_button_decline"
-                android:clickable="true"
-                android:focusable="true"
+            <TextView
+                android:id="@+id/tvDecline"
+                style="@style/Widget.Compat.NotificationActionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/base_margin_half"
-                    android:layout_marginRight="@dimen/base_margin_half"
-                    android:src="@drawable/ic_decline"
-                    android:tint="@android:color/white"
-                    app:tint="@android:color/white"
-                    tools:ignore="UseAppTint" />
-
-                <TextView
-                    android:id="@+id/tvDecline"
-                    style="@style/Widget.Compat.NotificationActionText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/base_margin_half"
-                    android:layout_marginRight="@dimen/base_margin_half"
-                    android:visibility="gone"
-                    android:gravity="center"
-                    android:text="@string/text_decline"
-                    android:textAllCaps="false"
-                    android:textColor="@color/action_text" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/base_margin_x2"
-                android:layout_height="match_parent" />
-
-            <LinearLayout
-                android:id="@+id/llAccept"
-                android:layout_width="@dimen/base_margin_x4"
-                android:layout_height="@dimen/base_margin_x4"
-                android:background="@drawable/rounded_button_accept"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/base_margin_half"
-                    android:layout_marginRight="@dimen/base_margin_half"
-                    android:src="@drawable/ic_accept"
-                    android:tint="@android:color/white"
-                    app:tint="@android:color/white"
-                    tools:ignore="UseAppTint" />
-
-                <TextView
-                    android:id="@+id/tvAccept"
-                    style="@style/Widget.Compat.NotificationActionText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/base_margin_half"
-                    android:layout_marginRight="@dimen/base_margin_half"
-                    android:gravity="center"
-                    android:text="@string/text_accept"
-                    android:visibility="gone"
-                    android:textAllCaps="false"
-                    android:textColor="@color/action_text" />
-
-            </LinearLayout>
-
+                android:text="@string/text_decline"
+                android:textAllCaps="false"
+                android:textColor="@color/action_text" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="10dp"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/llAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:background="@drawable/rounded_button_accept"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="6dp"
+                android:src="@drawable/ic_accept"
+                android:tint="@android:color/white"
+                app:tint="@android:color/white"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/tvAccept"
+                style="@style/Widget.Compat.NotificationActionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:gravity="center"
+                android:text="@string/text_accept"
+                android:textAllCaps="false"
+                android:textColor="@color/action_text" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

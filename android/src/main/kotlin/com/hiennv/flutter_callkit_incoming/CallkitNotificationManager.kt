@@ -171,6 +171,10 @@ class CallkitNotificationManager(
             data.getString(CallkitConstants.EXTRA_CALLKIT_ID, "callkit_incoming").hashCode()
         createNotificationChanel(data)
 
+        val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
+        val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
+        val hasCustomActionText = !TextUtils.isEmpty(textAccept) || !TextUtils.isEmpty(textDecline)
+
         notificationBuilder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder?.setChannelId(NOTIFICATION_CHANNEL_ID_INCOMING)
         notificationBuilder?.setDefaults(NotificationCompat.DEFAULT_VIBRATE)
@@ -216,7 +220,7 @@ class CallkitNotificationManager(
         val isCustomSmallExNotification =
             data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_CUSTOM_SMALL_EX_NOTIFICATION, false)
         if (isCustomNotification) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !hasCustomActionText) {
 
                 val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
                 val person = Person.Builder().setName(caller).setImportant(
@@ -282,7 +286,6 @@ class CallkitNotificationManager(
 
                 notificationBuilder?.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 notificationBuilder?.setCustomContentView(notificationSmallViews)
-                notificationBuilder?.setCustomBigContentView(notificationViews)
                 notificationBuilder?.setCustomHeadsUpContentView(notificationSmallViews)
             }
         } else {
@@ -312,7 +315,7 @@ class CallkitNotificationManager(
                 )
             }
             val caller = data.getString(CallkitConstants.EXTRA_CALLKIT_NAME_CALLER, "")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !hasCustomActionText) {
                 val person = Person.Builder().setName(caller).setImportant(
                     data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, true)
                 ).setBot(data.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false)).build()
@@ -325,17 +328,15 @@ class CallkitNotificationManager(
                 )
             } else {
                 notificationBuilder?.setContentTitle(caller)
-                val textDecline = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
                 val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_decline,
                     if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_decline) else textDecline,
                     getDeclinePendingIntent(notificationId, data)
                 ).build()
                 notificationBuilder?.addAction(declineAction)
-                val textAccept = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
                 val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
                     R.drawable.ic_accept,
-                    if (TextUtils.isEmpty(textDecline)) context.getString(R.string.text_accept) else textAccept,
+                    if (TextUtils.isEmpty(textAccept)) context.getString(R.string.text_accept) else textAccept,
                     getAcceptPendingIntent(notificationId, data)
                 ).build()
                 notificationBuilder?.addAction(acceptAction)
@@ -357,6 +358,12 @@ class CallkitNotificationManager(
         if (isShowCallID) {
             remoteViews.setTextViewText(
                 R.id.tvNumber, data.getString(CallkitConstants.EXTRA_CALLKIT_HANDLE, "")
+            )
+        } else {
+            val textSubtitle = data.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_SUBTITLE, "")
+            remoteViews.setTextViewText(
+                R.id.tvNumber,
+                if (TextUtils.isEmpty(textSubtitle)) context.getString(R.string.text_incoming_call) else textSubtitle
             )
         }
         remoteViews.setOnClickPendingIntent(
