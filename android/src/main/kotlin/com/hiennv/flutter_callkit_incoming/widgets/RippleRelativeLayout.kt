@@ -137,6 +137,79 @@ class RippleRelativeLayout : RelativeLayout {
         }
     }
 
+    fun updateRippleSettings(
+        color: Int? = null,
+        amount: Int? = null,
+        radius: Float? = null,
+        scale: Float? = null,
+        duration: Int? = null
+    ) {
+        // Stop current animation
+        stopRippleAnimation()
+        
+        // Update settings
+        color?.let { rippleColor = it }
+        amount?.let { rippleAmount = it }
+        radius?.let { rippleRadius = it }
+        scale?.let { rippleScale = it }
+        duration?.let { rippleDurationTime = it }
+        
+        // Update paint
+        paint.color = rippleColor
+        
+        // Clear existing views
+        for (rippleView in rippleViewList) {
+            removeView(rippleView)
+        }
+        rippleViewList.clear()
+        animatorList?.clear()
+        
+        // Recalculate delay
+        rippleDelay = rippleDurationTime / rippleAmount
+        
+        // Update layout params
+        rippleParams = LayoutParams(
+            (2 * rippleRadius).toInt(),
+            (2 * rippleRadius).toInt()
+        )
+        rippleParams!!.addRule(CENTER_IN_PARENT, TRUE)
+        
+        // Recreate animator set
+        animatorSet = AnimatorSet()
+        animatorSet!!.interpolator = AccelerateDecelerateInterpolator()
+        animatorList = ArrayList()
+        
+        // Recreate ripple views
+        for (i in 0 until rippleAmount) {
+            val rippleView: RippleView = RippleView(context)
+            addView(rippleView, 0, rippleParams)  // Add at index 0 to keep behind other views
+            rippleViewList.add(rippleView)
+            
+            val scaleXAnimator = ObjectAnimator.ofFloat(rippleView, "ScaleX", 1.0f, rippleScale)
+            scaleXAnimator.repeatCount = ObjectAnimator.INFINITE
+            scaleXAnimator.repeatMode = ObjectAnimator.RESTART
+            scaleXAnimator.startDelay = (i * rippleDelay).toLong()
+            scaleXAnimator.duration = rippleDurationTime.toLong()
+            animatorList!!.add(scaleXAnimator)
+            
+            val scaleYAnimator = ObjectAnimator.ofFloat(rippleView, "ScaleY", 1.0f, rippleScale)
+            scaleYAnimator.repeatCount = ObjectAnimator.INFINITE
+            scaleYAnimator.repeatMode = ObjectAnimator.RESTART
+            scaleYAnimator.startDelay = (i * rippleDelay).toLong()
+            scaleYAnimator.duration = rippleDurationTime.toLong()
+            animatorList!!.add(scaleYAnimator)
+            
+            val alphaAnimator = ObjectAnimator.ofFloat(rippleView, "Alpha", 1.0f, 0f)
+            alphaAnimator.repeatCount = ObjectAnimator.INFINITE
+            alphaAnimator.repeatMode = ObjectAnimator.RESTART
+            alphaAnimator.startDelay = (i * rippleDelay).toLong()
+            alphaAnimator.duration = rippleDurationTime.toLong()
+            animatorList!!.add(alphaAnimator)
+        }
+        
+        animatorSet!!.playTogether(animatorList)
+    }
+
     companion object {
         private const val DEFAULT_RIPPLE_COUNT = 5
         private const val DEFAULT_DURATION_TIME = 6000

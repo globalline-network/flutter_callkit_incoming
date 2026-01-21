@@ -98,7 +98,8 @@ class CallkitIncomingActivity : Activity() {
         }
         transparentStatusAndNavigation()
         setContentView(R.layout.activity_callkit_incoming)
-        initView()
+        val data = intent.extras?.getBundle(CallkitConstants.EXTRA_CALLKIT_INCOMING_DATA)
+        initView(data)
         incomingData(intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(
@@ -265,11 +266,15 @@ class CallkitIncomingActivity : Activity() {
         }, timeOut)
     }
 
-    private fun initView() {
+    private fun initView(data: Bundle?) {
         ivBackground = findViewById(R.id.ivBackground)
         llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
         llBackgroundAnimation.layoutParams.height =
             Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
+        
+        // Apply ripple settings BEFORE starting animation
+        applyRippleSettings(data)
+        
         llBackgroundAnimation.startRippleAnimation()
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
@@ -301,6 +306,47 @@ class CallkitIncomingActivity : Activity() {
         val shakeAnimation =
             AnimationUtils.loadAnimation(this@CallkitIncomingActivity, R.anim.shake_anim)
         ivAcceptCall.animation = shakeAnimation
+    }
+
+    private fun applyRippleSettings(data: Bundle?) {
+        if (data == null) {
+            Log.d("CallkitIncoming", "applyRippleSettings: data is null")
+            return
+        }
+
+        val rippleColorStr = data.getString(CallkitConstants.EXTRA_CALLKIT_RIPPLE_COLOR, "")
+        val rippleAmount = data.getInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_AMOUNT, 4)
+        val rippleRadius = data.getFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_RADIUS, 60f)
+        val rippleScale = data.getFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_SCALE, 4.5f)
+        val rippleDuration = data.getInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_DURATION, 3000)
+
+        Log.d("CallkitIncoming", "applyRippleSettings received: color='$rippleColorStr', amount=$rippleAmount, radius=$rippleRadius, scale=$rippleScale, duration=$rippleDuration")
+
+        // Only apply if at least one custom value is provided
+        if (rippleColorStr.isEmpty() && rippleAmount == 4 && rippleRadius == 60f && rippleScale == 4.5f && rippleDuration == 3000) {
+            Log.d("CallkitIncoming", "applyRippleSettings: All values are defaults, skipping")
+            return
+        }
+
+        try {
+            Log.d("CallkitIncoming", "Applying ripple settings: color=$rippleColorStr, amount=$rippleAmount, radius=$rippleRadius, scale=$rippleScale, duration=$rippleDuration")
+            
+            val rippleColor = if (rippleColorStr.isNotEmpty()) Color.parseColor(rippleColorStr) else null
+            val radiusPx = Utils.dpToPx(rippleRadius)
+            
+            llBackgroundAnimation.updateRippleSettings(
+                color = rippleColor,
+                amount = rippleAmount,
+                radius = radiusPx,
+                scale = rippleScale,
+                duration = rippleDuration
+            )
+            
+            Log.d("CallkitIncoming", "Ripple settings applied successfully")
+        } catch (e: Exception) {
+            Log.e("CallkitIncoming", "Failed to apply ripple settings: ${e.message}", e)
+            e.printStackTrace()
+        }
     }
 
 

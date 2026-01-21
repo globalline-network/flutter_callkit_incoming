@@ -141,6 +141,21 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("isBot")
     var isBot: Boolean = false
 
+    @JsonProperty("rippleColor")
+    var rippleColor: String = ""
+
+    @JsonProperty("rippleAmount")
+    var rippleAmount: Int = 4
+
+    @JsonProperty("rippleRadius")
+    var rippleRadius: Float = 60f
+
+    @JsonProperty("rippleScale")
+    var rippleScale: Float = 4.5f
+
+    @JsonProperty("rippleDuration")
+    var rippleDuration: Int = 3000
+
     init {
         var android: Map<String, Any?>? = args["android"] as? HashMap<String, Any?>?
         android = android ?: args
@@ -161,6 +176,14 @@ data class Data(val args: Map<String, Any?>) {
         isImportant = android["isImportant"] as? Boolean ?: false
         isBot = android["isBot"] as? Boolean ?: false
 
+        val rippleEffect: Map<String, Any?>? = android["rippleEffect"] as? Map<String, Any?>?
+        if (rippleEffect != null) {
+            rippleColor = rippleEffect["color"] as? String ?: ""
+            rippleAmount = rippleEffect["amount"] as? Int ?: 4
+            rippleRadius = (rippleEffect["radius"] as? Number)?.toFloat() ?: 60f
+            rippleScale = (rippleEffect["scale"] as? Number)?.toFloat() ?: 4.5f
+            rippleDuration = rippleEffect["duration"] as? Int ?: 3000
+        }
 
         val missedNotification: Map<String, Any?>? =
             args["missedCallNotification"] as? Map<String, Any?>?
@@ -325,6 +348,11 @@ data class Data(val args: Map<String, Any?>) {
             CallkitConstants.EXTRA_CALLKIT_IS_BOT,
             isBot,
         )
+        bundle.putString(CallkitConstants.EXTRA_CALLKIT_RIPPLE_COLOR, rippleColor)
+        bundle.putInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_AMOUNT, rippleAmount)
+        bundle.putFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_RADIUS, rippleRadius)
+        bundle.putFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_SCALE, rippleScale)
+        bundle.putInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_DURATION, rippleDuration)
         return bundle
     }
 
@@ -352,6 +380,16 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
             data.isBot =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_BOT, false)
+            data.rippleColor =
+                bundle.getString(CallkitConstants.EXTRA_CALLKIT_RIPPLE_COLOR, "")
+            data.rippleAmount =
+                bundle.getInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_AMOUNT, 4)
+            data.rippleRadius =
+                bundle.getFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_RADIUS, 60f)
+            data.rippleScale =
+                bundle.getFloat(CallkitConstants.EXTRA_CALLKIT_RIPPLE_SCALE, 4.5f)
+            data.rippleDuration =
+                bundle.getInt(CallkitConstants.EXTRA_CALLKIT_RIPPLE_DURATION, 3000)
 
             data.missedNotificationId =
                 bundle.getInt(CallkitConstants.EXTRA_CALLKIT_MISSED_CALL_ID)

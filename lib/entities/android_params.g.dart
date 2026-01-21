@@ -25,6 +25,11 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       isShowFullLockedScreen: json['isShowFullLockedScreen'] as bool?,
       isImportant: json['isImportant'] as bool?,
       isBot: json['isBot'] as bool?,
+      rippleEffect: json['rippleEffect'] == null
+          ? null
+          : RippleEffectParams.fromJson(
+              json['rippleEffect'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
@@ -46,4 +51,5 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'isShowFullLockedScreen': instance.isShowFullLockedScreen,
       'isImportant': instance.isImportant,
       'isBot': instance.isBot,
+      'rippleEffect': instance.rippleEffect?.toJson(),
     };

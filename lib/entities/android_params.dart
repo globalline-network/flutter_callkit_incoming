@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'ripple_effect_params.dart';
+
 part 'android_params.g.dart';
 
 /// Object config for Android.
@@ -21,6 +23,7 @@ class AndroidParams {
     this.isShowFullLockedScreen,
     this.isImportant,
     this.isBot,
+    this.rippleEffect,
   });
 
   /// Using custom notifications.
@@ -69,6 +72,9 @@ class AndroidParams {
   /// Used primarily to identify automated tooling.
   /// https://developer.android.com/reference/androidx/core/app/Person#isBot()
   final bool? isBot;
+
+  /// Ripple effect parameters for the avatar glow animation.
+  final RippleEffectParams? rippleEffect;
 
   factory AndroidParams.fromJson(Map<String, dynamic> json) =>
       _$AndroidParamsFromJson(json);
