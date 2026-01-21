@@ -40,9 +40,6 @@ data class Data(val args: Map<String, Any?>) {
     @JsonProperty("textDecline")
     var textDecline: String = (args["textDecline"] as? String) ?: ""
 
-    @JsonProperty("textSubtitle")
-    var textSubtitle: String = (args["textSubtitle"] as? String) ?: ""
-
     @JsonProperty("extra")
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
@@ -222,7 +219,6 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putLong(CallkitConstants.EXTRA_CALLKIT_DURATION, duration)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, textAccept)
         bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, textDecline)
-        bundle.putString(CallkitConstants.EXTRA_CALLKIT_TEXT_SUBTITLE, textSubtitle)
 
         missedNotificationId?.let {
             bundle.putInt(
@@ -352,8 +348,6 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_ACCEPT, "")
             data.textDecline =
                 bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_DECLINE, "")
-            data.textSubtitle =
-                bundle.getString(CallkitConstants.EXTRA_CALLKIT_TEXT_SUBTITLE, "")
             data.isImportant =
                 bundle.getBoolean(CallkitConstants.EXTRA_CALLKIT_IS_IMPORTANT, false)
             data.isBot =
