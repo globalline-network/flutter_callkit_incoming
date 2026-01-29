@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ivAvatar"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/base_margin_x2"
+                android:layout_marginTop="@dimen/base_margin_x5"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -72,8 +72,9 @@
                     android:autoSizeMinTextSize="12sp"
                     android:autoSizeStepGranularity="2sp"
                     android:autoSizeTextType="uniform"
-                    android:ellipsize="end"
-                    android:maxLines="1"
+                    android:gravity="center"
+                    android:maxLines="3"
+                    android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/size_text_name"
                     app:autoSizeMaxTextSize="@dimen/size_text_name"
