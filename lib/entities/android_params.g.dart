@@ -28,8 +28,11 @@ AndroidParams _$AndroidParamsFromJson(Map<String, dynamic> json) =>
       rippleEffect: json['rippleEffect'] == null
           ? null
           : RippleEffectParams.fromJson(
-              json['rippleEffect'] as Map<String, dynamic>,
-            ),
+              json['rippleEffect'] as Map<String, dynamic>),
+      isFullScreen: json['isFullScreen'] as bool?,
+      from: json['from'] as String?,
+      textAccept: json['textAccept'] as String?,
+      textDecline: json['textDecline'] as String?,
     );
 
 Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
@@ -52,4 +55,8 @@ Map<String, dynamic> _$AndroidParamsToJson(AndroidParams instance) =>
       'isImportant': instance.isImportant,
       'isBot': instance.isBot,
       'rippleEffect': instance.rippleEffect?.toJson(),
+      'isFullScreen': instance.isFullScreen,
+      'from': instance.from,
+      'textAccept': instance.textAccept,
+      'textDecline': instance.textDecline,
     };
