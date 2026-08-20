@@ -87,3 +87,24 @@ Make sure when you create Bundle ID(https://developer.apple.com/account/resource
 
     To be able to testing in Terminated State
     `Xcode -> Edit Schema -> Wait for the executable to be launched`
+
+
+## Integration Guide
+
+### APNs Push Notification Troubleshooting
+
+When integrating this project into other applications, be aware of the following common APNs error scenarios:
+
+#### BadDeviceToken Error
+If you receive a `BadDeviceToken` error, verify that you're using the correct APNs environment:
+- **Sandbox environment**: Use for debug or development builds
+- **Production environment**: Use for TestFlight or App Store builds
+
+The device token format differs between environments, and using the wrong environment will result in this error.
+
+#### TopicDisallowed Error
+If you receive a `TopicDisallowed` error, verify that:
+- The **bundle ID** in your APNs certificate matches the bundle ID of your application
+- You're using the correct APNs authentication key/certificate for the target bundle ID
+
+This error typically occurs when there's a mismatch between the app's bundle identifier and the topic specified in the push notification certificate.
