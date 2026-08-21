@@ -1,834 +1,189 @@
 # Flutter Callkit Incoming
 
+> **This is Globalline's fork
+> of [hiennguyen92/flutter_callkit_incoming](https://github.com/hiennguyen92/flutter_callkit_incoming).
+**
+> Installation, usage and the full parameter reference live in upstream's docs — their
+> [README](https://github.com/hiennguyen92/flutter_callkit_incoming#readme) or
+> [pub.dev](https://pub.dev/packages/flutter_callkit_incoming) — bearing in mind both track
+> upstream's latest release, not this fork's baseline (currently `3.1.5`). iOS VoIP setup is in
+> [PUSHKIT.md](PUSHKIT.md) — upstream's guide, with our APNs troubleshooting notes appended at the
+> end.
+
 A Flutter plugin to show incoming call in your Flutter app (Custom for Android/Callkit for iOS).
 
-[![pub package](https://img.shields.io/pub/v/flutter_callkit_incoming.svg)](https://pub.dev/packages/flutter_callkit_incoming)
-[![pub points](https://img.shields.io/pub/points/flutter_callkit_incoming?label=pub%20points)](https://pub.dev/packages/flutter_callkit_incoming/score)
-[![GitHub stars](https://img.shields.io/github/stars/hiennguyen92/flutter_callkit_incoming.svg?style=social)](https://github.com/hiennguyen92/flutter_callkit_incoming/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/hiennguyen92/flutter_callkit_incoming.svg?style=social)](https://github.com/hiennguyen92/flutter_callkit_incoming/network)
-[![GitHub license](https://img.shields.io/github/license/hiennguyen92/flutter_callkit_incoming.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/LICENSE)
-[![Build Status](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml/badge.svg)](https://github.com/hiennguyen92/flutter_callkit_incoming/actions/workflows/main.yml)
+Everything else you need to know about the fork is on this page:
 
-## Sponsors
+- [Consuming this fork](#consuming-this-fork)
+- [Updating to the latest upstream version](#updating-to-the-latest-upstream-version)
+- [Files that conflict every time](#files-that-conflict-every-time)
+- [After a merge: what to check](#after-a-merge-what-to-check)
+- [What we changed locally](#what-we-changed-locally)
+- [Working in this repo](#working-in-this-repo)
+- [Remotes](#remotes)
+- [Regenerating serialization code](#regenerating-serialization-code)
 
-Our top sponsors are shown below!
+## Consuming this fork
 
-<a href="https://getstream.io/video/sdk/flutter/tutorial/video-calling/?utm_source=Github&utm_medium=Github_Repo_Content_Ad&utm_content=Developer&utm_campaign=Github_Video&utm_term=flutter_callkit" target="_blank">
-  <img width="250px" src="https://stream-blog.s3.amazonaws.com/blog/wp-content/uploads/fc148f0fc75d02841d017bb36e14e388/Stream-logo-with-background-.png"/>
-</a>
-<br/>
-<span>
-  <a href="https://getstream.io/video/sdk/flutter/tutorial/video-calling/?utm_source=Github&utm_medium=Github_Repo_Content_Ad&utm_content=Developer&utm_campaign=Github_Video&utm_term=flutter_callkit" target="_blank">Try the Flutter Video Tutorial 📹</a>
-</span>
-</br>
-</br>
-<a href="https://www.buymeacoffee.com/hiennguyen92" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174">
-</a>
+Apps depend on the fork by git ref, not from pub.dev:
 
-## 📌 Table of Contents
-- [⭐ Features](#-features)
-- [🚀 Installation](#-installation)
-  - [1. Install Packages](#1-install-packages)
-  - [2. Configure Project](#2-configure-project)
-    - [Android Configuration](#android)
-    - [iOS Configuration](#ios)
-    - [Swift Package Manager (SPM) Support](#swift-package-manager-spm-support-flutter-324)
-  - [3. Usage](#3-usage)
-- [📋 Properties](#-properties)
-- [📱 Pushkit Setup](#-pushkit---received-voip-and-wake-app-from-terminated-state-ios-only)
-- [🎯 Demo](#-demo)
-
-## ⭐ Features
-
-- Show an incoming call
-- Start an outgoing call
-- Custom UI Android/Callkit for iOS
-- Example using Pushkit/VoIP for iOS
-
-> [!WARNING]
-> ### iOS: ONLY WORKING ON REAL DEVICE
-> **Please make sure setup/using [PUSHKIT](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md) FOR VOIP**
->
-> *Note:* Please do not use on simulator (Callkit framework is not fully supported on simulator for incoming VoIP calls).
-
-## 🚀 Installation
-
-### 1. Install Packages
-
-For version >= v2.5.0, please make sure install and use Java SDK version >= 17 (Android)
-
-**Run this command:**
-```bash
-flutter pub add flutter_callkit_incoming
-```
-
-**Or add to pubspec.yaml:**
 ```yaml
 dependencies:
-  flutter_callkit_incoming: ^latest
+  flutter_callkit_incoming:
+    git:
+      url: https://github.com/globalline-network/flutter_callkit_incoming.git
+      ref: <commit-sha-or-tag>
 ```
 
-### 2. Configure Project
+Pin a **commit SHA or tag**, never a branch name — otherwise it's impossible to tell which state of
+the fork an app build actually shipped.
 
-#### Android
+## Updating to the latest upstream version
 
-**AndroidManifest.xml:**
-```xml
-<manifest...>
-    ...
-    <!-- Using for load image from internet -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+In GitHub Desktop:
 
-    <application ...>
-        <activity ...
-            android:name=".MainActivity"
-            android:launchMode="singleInstance"><!-- add this -->
-        ...
-    </application>
-</manifest>
-```
+**1. Fetch origin** — gets the latest code from their repo. There's no branch to choose: *Fetch
+origin* updates every remote at once. The branch you want is upstream's `master`, which is where
+hiennguyen92 publishes releases — their `dev` branch is work in progress, don't merge that one.
 
-**Proguard Rules:**
-The following rule needs to be added in the `proguard-rules.pro` to avoid obfuscated keys:
-```
--keep class com.hiennv.flutter_callkit_incoming.** { *; }
-```
+**2. Merge it into our `master`.** On `master`: *Branch → Merge into current branch…*, then pick
+`master` under hiennguyen92's repo, not ours. If their branches aren't listed, the `upstream` remote
+isn't set up on this clone — see [Remotes](#remotes).
 
-#### iOS
+**3. Resolve the conflicts** — the same few files every time, listed below. Keep **both** sides:
+upstream's new code and our changes.
 
-**Info.plist:**
-```xml
-<key>UIBackgroundModes</key>
-<array>
-    <string>voip</string>
-    <string>remote-notification</string>
-    <string>processing</string> <!-- you can add this if needed -->
-</array>
-```
+GitHub Desktop will then offer *Push origin*; that's what makes the update live for everyone.
 
-#### Swift Package Manager (SPM) Support (Flutter 3.24+)
+The *Sync fork* button on github.com looks like a shortcut for all this, but it gives up as soon as
+there are conflicts — which here is every time.
 
-This plugin natively supports Swift Package Manager (SPM). To configure your project to build using SPM instead of CocoaPods, run:
+### Files that conflict every time
 
-```bash
-flutter config --enable-swift-package-manager
-```
+Our changes live inside files upstream also edits, so these come up on every sync:
 
-> [!IMPORTANT]
-> Swift Package Manager is highly recommended for modern Flutter projects as CocoaPods is in maintenance mode and will become read-only in December 2026.
+| File                                                    | Why it conflicts                                                                                                        |
+|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `android/.../CallkitIncomingActivity.kt`                | Upstream's busiest file, and it holds our `applyRippleSettings()` plus the changed `initView(data)` signature.          |
+| `android/.../Call.kt`                                   | Upstream regularly adds fields to `Data`, `toBundle()` and `fromBundle()` — our five `ripple*` fields sit in all three. |
+| `android/src/main/res/**/activity_callkit_incoming.xml` | Our caller-name layout change, in both the portrait and landscape variants.                                             |
+| `lib/entities/android_params.dart` (and its `.g.dart`)  | Upstream adds parameters here too; ours is `rippleEffect`.                                                              |
 
-### 3. Usage
+If a conflict looks like a choice between upstream's version and ours, it almost certainly isn't —
+it needs both.
 
-#### Import
-```dart
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-```
-
-#### Show Incoming Call
-```dart
-this._currentUuid = _uuid.v4();
-CallKitParams callKitParams = CallKitParams(
-  id: _currentUuid,
-  nameCaller: 'Hien Nguyen',
-  appName: 'Callkit',
-  avatar: 'https://i.pravatar.cc/100',
-  handle: '0123456789',
-  type: 0,
-  textAccept: 'Accept',
-  textDecline: 'Decline',
-  missedCallNotification: NotificationParams(
-    showNotification: true,
-    isShowCallback: true,
-    subtitle: 'Missed call',
-    callbackText: 'Call back',
-  ),
-  callingNotification: const NotificationParams(
-    showNotification: true,
-    isShowCallback: true,
-    subtitle: 'Calling...',
-    callbackText: 'Hang Up',
-  ),
-  duration: 30000,
-  extra: <String, dynamic>{'userId': '1a2b3c4d'},
-  headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-  android: const AndroidParams(
-    isCustomNotification: true,
-    isShowLogo: false,
-    logoUrl: 'https://i.pravatar.cc/100',
-    ringtonePath: 'system_ringtone_default',
-    backgroundColor: '#0955fa',
-    backgroundUrl: 'https://i.pravatar.cc/500',
-    actionColor: '#4CAF50',
-    textColor: '#ffffff',
-    incomingCallNotificationChannelName: "Incoming Call",
-    missedCallNotificationChannelName: "Missed Call",
-    isShowCallID: false
-  ),
-  ios: IOSParams(
-    iconName: 'CallKitLogo',
-    handleType: 'generic',
-    supportsVideo: true,
-    maximumCallGroups: 2,
-    maximumCallsPerCallGroup: 1,
-    audioSessionMode: 'default',
-    audioSessionActive: true,
-    audioSessionPreferredSampleRate: 44100.0,
-    audioSessionPreferredIOBufferDuration: 0.005,
-    supportsDTMF: true,
-    supportsHolding: true,
-    supportsGrouping: false,
-    supportsUngrouping: false,
-    ringtonePath: 'system_ringtone_default',
-  ),
-);
-await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
-```
-
-> **Note:** For Firebase Message: `@pragma('vm:entry-point')`  
-> https://github.com/firebase/flutterfire/blob/master/docs/cloud-messaging/receive.md#apple-platforms-and-android
-
-#### Request Notification Permission (Android 13+/iOS)
-
-For Android 13+, please `requestNotificationPermission` or requestPermission of firebase_messaging before `showCallkitIncoming`:
-
-```dart
-await FlutterCallkitIncoming.requestNotificationPermission({
-  "title": "Notification permission",
-  "rationaleMessagePermission": "Notification permission is required, to show notification.",
-  "postNotificationMessageRequired": "Notification permission is required, Please allow notification permission from setting."
-});
-```
-
-#### Request Full Intent Permission (Android 14+)
-
-For Android 14+, please use `canUseFullScreenIntent` and `requestFullIntentPermission`:
-
-```dart
-// Check if can use full screen intent
-await FlutterCallkitIncoming.canUseFullScreenIntent();
-
-// Request full intent permission
-await FlutterCallkitIncoming.requestFullIntentPermission();
-```
-
-#### Show Missed Call Notification
-```dart
-this._currentUuid = _uuid.v4();
-CallKitParams params = CallKitParams(
-  id: _currentUuid,
-  nameCaller: 'Hien Nguyen',
-  handle: '0123456789',
-  type: 1,
-  missedCallNotification: const NotificationParams(
-    showNotification: true,
-    isShowCallback: true,
-    subtitle: 'Missed call',
-    callbackText: 'Call back',
-  ),
-  android: const AndroidParams(
-    isCustomNotification: true,
-    isShowCallID: true,
-  ),
-  extra: <String, dynamic>{'userId': '1a2b3c4d'},
-);
-await FlutterCallkitIncoming.showMissCallNotification(params);
-```
-
-#### Hide Call Notification (Android)
-```dart
-CallKitParams params = CallKitParams(
-  id: _currentUuid,
-);
-await FlutterCallkitIncoming.hideCallkitIncoming(params);
-```
-
-#### Start Outgoing Call
-```dart
-this._currentUuid = _uuid.v4();
-CallKitParams params = CallKitParams(
-  id: this._currentUuid,
-  nameCaller: 'Hien Nguyen',
-  handle: '0123456789',
-  type: 1,
-  extra: <String, dynamic>{'userId': '1a2b3c4d'},
-  ios: IOSParams(handleType: 'generic'),
-  callingNotification: const NotificationParams(
-    showNotification: true,
-    isShowCallback: true,
-    subtitle: 'Calling...',
-    callbackText: 'Hang Up',
-  ),
-  android: const AndroidParams(
-    isCustomNotification: true,
-    isShowCallID: true,
-  )
-);
-await FlutterCallkitIncoming.startCall(params);
-```
-
-#### End Call
-```dart
-// End specific call
-await FlutterCallkitIncoming.endCall(this._currentUuid);
-
-// End all calls
-await FlutterCallkitIncoming.endAllCalls();
-```
-
-#### Get Active Calls
-
-iOS: returns active calls from Callkit (only id), Android: only returns last call
-
-```dart
-await FlutterCallkitIncoming.activeCalls();
-```
-
-**Output:**
-```json
-[{"id": "8BAA2B26-47AD-42C1-9197-1D75F662DF78", ...}]
-```
-
-#### Set Call Connected
-
-Used to determine Incoming Call or Outgoing Call status in phone book(reset/start timer):
-
-```dart
-await FlutterCallkitIncoming.setCallConnected(this._currentUuid);
-```
-
-> **Note:** After the call is ACCEPT or startCall, please call this function. Normally it should be called when WebRTC/P2P is established.
-
-#### Get Device Push Token VoIP
-
-iOS: returns deviceToken, Android: returns none
-
-```dart
-await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-```
-
-**Output:**
-```
-d6a77ca80c5f09f87f353cdd328ec8d7d34e92eb108d046c91906f27f54949cd
-```
-
-> **Important:** Make sure using `SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)` inside AppDelegate.swift ([Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift))
-
-```swift
-func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
-    print(credentials.token)
-    let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
-    // Save deviceToken to your server
-    SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP(deviceToken)
-}
-
-func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
-    print("didInvalidatePushTokenFor")
-    SwiftFlutterCallkitIncomingPlugin.sharedInstance?.setDevicePushTokenVoIP("")
-}
-```
-
-#### Listen Events
-```dart
-FlutterCallkitIncoming.onEvent.listen((CallEvent event) {
-  switch (event!.event) {
-    case Event.actionCallIncoming:
-      // TODO: received an incoming call
-      break;
-    case Event.actionCallStart:
-      // TODO: started an outgoing call
-      // TODO: show screen calling in Flutter
-      break;
-    case Event.actionCallAccept:
-      // TODO: accepted an incoming call
-      // TODO: show screen calling in Flutter
-      break;
-    case Event.actionCallDecline:
-      // TODO: declined an incoming call
-      break;
-    case Event.actionCallEnded:
-      // TODO: ended an incoming/outgoing call
-      break;
-    case Event.actionCallTimeout:
-      // TODO: missed an incoming call
-      break;
-    case Event.actionCallCallback:
-      // TODO: click action `Call back` from missed call notification
-      break;
-    case Event.actionCallToggleHold:
-      // TODO: only iOS
-      break;
-    case Event.actionCallToggleMute:
-      // TODO: only iOS
-      break;
-    case Event.actionCallToggleDmtf:
-      // TODO: only iOS
-      break;
-    case Event.actionCallToggleGroup:
-      // TODO: only iOS
-      break;
-    case Event.actionCallToggleAudioSession:
-      // TODO: only iOS
-      break;
-    case Event.actionDidUpdateDevicePushTokenVoip:
-      // TODO: only iOS
-      break;
-    case Event.actionCallCustom:
-      // TODO: for custom action
-      break;
-  }
-});
-```
-
-#### Call from Native (iOS/Android)
-
-**Swift (iOS):**
-```swift
-var info = [String: Any?]()
-info["id"] = "44d915e1-5ff4-4bed-bf13-c423048ec97a"
-info["nameCaller"] = "Hien Nguyen"
-info["handle"] = "0123456789"
-info["type"] = 1
-// ... set more data
-SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(flutter_callkit_incoming.Data(args: info), fromPushKit: true)
-
-// Please make sure call `completion()` at the end of the pushRegistry(......, completion: @escaping () -> Void)
-// or `DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { completion() }`
-// if you don't call completion() in pushRegistry(......, completion: @escaping () -> Void), there may be app crash by system when receiving VoIP
-```
-
-**Kotlin (Android):**
-```kotlin
-FlutterCallkitIncomingPlugin.getInstance().showIncomingNotification(...)
-```
-
-**Alternative Swift approach:**
-```swift
-let data = flutter_callkit_incoming.Data(id: "44d915e1-5ff4-4bed-bf13-c423048ec97a", nameCaller: "Hien Nguyen", handle: "0123456789", type: 0)
-data.nameCaller = "Johnny"
-data.extra = ["user": "abc@123", "platform": "ios"]
-// ... set more data
-SwiftFlutterCallkitIncomingPlugin.sharedInstance?.showCallkitIncoming(data, fromPushKit: true)
-```
-
-**Objective-C:**
-```objc
-#if __has_include(<flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>)
-#import <flutter_callkit_incoming/flutter_callkit_incoming-Swift.h>
-#else
-#import "flutter_callkit_incoming-Swift.h"
-#endif
-
-Data * data = [[Data alloc]initWithId:@"44d915e1-5ff4-4bed-bf13-c423048ec97a" nameCaller:@"Hien Nguyen" handle:@"0123456789" type:1];
-[data setNameCaller:@"Johnny"];
-[data setExtra:@{ @"userId" : @"HelloXXXX", @"key2" : @"value2"}];
-// ... set more data
-[SwiftFlutterCallkitIncomingPlugin.sharedInstance showCallkitIncoming:data fromPushKit:YES];
-```
-
-**Send Custom Event from Native:**
-
-**Swift:**
-```swift
-SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendEventCustom(body: ["customKey": "customValue"])
-```
-
-**Kotlin:**
-```kotlin
-FlutterCallkitIncomingPlugin.getInstance().sendEventCustom(body: Map<String, Any>)
-```
-
-#### Call API when Accept/Decline/End/Timeout
-#### Setup for Missed call notification(iOS)
-
-**AppDelegate.swift:**
-```swift
-@UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate, PKPushRegistryDelegate, CallkitIncomingAppDelegate {
-    
-    override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        GeneratedPluginRegistrant.register(with: self)
-        
-        // Setup VOIP
-        let mainQueue = DispatchQueue.main
-        let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
-        voipRegistry.delegate = self
-        voipRegistry.desiredPushTypes = [PKPushType.voIP]
-
-        // Use if using WebRTC
-        // RTCAudioSession.sharedInstance().useManualAudio = true
-        // RTCAudioSession.sharedInstance().isAudioEnabled = false
-
-        //Add for Missed call notification
-        if #available(iOS 10.0, *) {
-          UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
-        }
-        
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    }
-
-    // Add for Missed call notification(show notification when foreground)
-    override func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification,
-                                withCompletionHandler completionHandler:
-                                   @escaping (UNNotificationPresentationOptions) -> Void) {
-        
-        CallkitNotificationManager.shared.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler)
-    }
-    
-    // Add for Missed call notification(action when click callback in missed notification)
-    override func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                         didReceive response: UNNotificationResponse,
-                                         withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == CallkitNotificationManager.CALLBACK_ACTION {
-            let data = response.notification.request.content.userInfo as? [String: Any]
-            SwiftFlutterCallkitIncomingPlugin.sharedInstance?.sendCallbackEvent(data)
-        }
-        completionHandler()
-    }
-
-    // Func Call API for Accept
-    func onAccept(_ call: Call, _ action: CXAnswerCallAction) {
-        let json = ["action": "ACCEPT", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onAccept")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-                // Make sure call action.fulfill() when you are done (connected WebRTC - Start counting seconds)
-                action.fulfill()
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    // Func Call API for Decline
-    func onDecline(_ call: Call, _ action: CXEndCallAction) {
-        let json = ["action": "DECLINE", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onDecline")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-                // Make sure call action.fulfill() when you are done
-                action.fulfill()
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    // Func Call API for End
-    func onEnd(_ call: Call, _ action: CXEndCallAction) {
-        let json = ["action": "END", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onEnd")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-                // Make sure call action.fulfill() when you are done
-                action.fulfill()
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    func onTimeOut(_ call: Call) {
-        let json = ["action": "TIMEOUT", "data": call.data.toJSON()] as [String: Any]
-        print("LOG: onTimeOut")
-        self.performRequest(parameters: json) { result in
-            switch result {
-            case .success(let data):
-                print("Received data: \(data)")
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    func didActivateAudioSession(_ audioSession: AVAudioSession) {
-        // Use if using WebRTC
-        // RTCAudioSession.sharedInstance().audioSessionDidActivate(audioSession)
-        // RTCAudioSession.sharedInstance().isAudioEnabled = true
-    }
-    
-    func didDeactivateAudioSession(_ audioSession: AVAudioSession) {
-        // Use if using WebRTC
-        // RTCAudioSession.sharedInstance().audioSessionDidDeactivate(audioSession)
-        // RTCAudioSession.sharedInstance().isAudioEnabled = false
-    }
-}
-```
-
-> **Please check full example:** [Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/ios/Runner/AppDelegate.swift)
-**Create MMainApplication.kt in your source directory **
-
-**MainApplication.kt:**
-```kotlin
-import android.app.Application
-import android.os.Bundle
-import android.content.Context
-import android.content.Intent
-import android.util.Log
-import com.hiennv.flutter_callkit_incoming.CallkitEventCallback
-import com.hiennv.flutter_callkit_incoming.FlutterCallkitIncomingPlugin
-import io.flutter.embedding.android.FlutterActivity
-import org.json.JSONObject
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
-
-private const val BASE_URL = "https://your-url/"
-private const val TAG = "com.medeet.app.MainApplication"
-
-
-class MainApplication : Application() {  // or FlutterApplication
-
-
-  private var callkitEventCallback = object: CallkitEventCallback{
-    override fun onCallEvent(event: CallkitEventCallback.CallEvent, callData: Bundle) {
-      when (event) {
-        CallkitEventCallback.CallEvent.ACCEPT -> {
-          // Save accepted call id to SharedPreferences
-          Log.d(TAG, "onAccept - Kotlin")
-
-        }
-        CallkitEventCallback.CallEvent.DECLINE -> {
-          Log.d(TAG, "on Decline - Kotlin")
-          val extra = callData.getSerializable("EXTRA_CALLKIT_EXTRA") as? HashMap<String, Any?>
-          Log.d(TAG, "on Decline - $extra")
-          sendDeclineCall(extra)
-        }
-        else -> {
-          // Handle other cases or do nothing
-        }
-      }
-
-    }
-  }
-
-  //Replace with your custom integration
-  private fun sendDeclineCall(extra: HashMap<String, Any?>?) {
-    // Read access token from SharedPreferences
-    val prefs = applicationContext.getSharedPreferences(
-      "FlutterSharedPreferences", Context.MODE_PRIVATE
-    )
-    val accessToken = prefs.getString("flutter.native_access_token", null)
-
-    if (accessToken.isNullOrEmpty()) {
-      Log.d(TAG, "declineCall - No access token found")
-      return
-    }
-    val jsonBody = JSONObject((extra ?: emptyMap<String, Any?>()) as Map<*, *>)
-
-
-    Log.d(TAG, "declineCall - body: $jsonBody")
-
-    // Send request on background thread
-    Thread {
-      try {
-        val url = URL("$BASE_URL/declineCall")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.setRequestProperty("Accept", "application/json")
-        connection.setRequestProperty("Authorization", "Bearer $accessToken")
-        connection.doOutput = true
-
-        val writer = OutputStreamWriter(connection.outputStream)
-        writer.write(jsonBody.toString())
-        writer.flush()
-        writer.close()
-        val responseCode = connection.responseCode
-        Log.d(TAG, "declineCall - Response status: $responseCode")
-        connection.disconnect()
-      } catch (e: Exception) {
-        Log.e(TAG, "declineCall - Request error: ${e.message}")
-      }
-    }.start()
-  }
-
-  override fun onCreate() {
-    super.onCreate()
-    FlutterCallkitIncomingPlugin.registerEventCallback(callkitEventCallback)
-
-  }
-}
-```
-***Add this to your app level build file***
-```
-   defaultConfig {
-     
-      ......
-        //Replace with your package name e.g "com.example.app.MainApplication"
-        manifestPlaceholders["applicationName"] = "com.example.flutter_callkit_incoming_example.MainApplication"
-
-    }
-```
-
-***Point ${applicationName} at your new class in Android manifest***
-```
- <application
-        ....
-        android:name="${applicationName}"
-         <activity
-        
+### After a merge: what to check
 
 ```
-> **Please check full example:** [Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/android/app/src/main/kotlin/com/example/flutter_callkit_incoming_example/MainActivity.kt
-)
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
+```
 
-## 📋 Properties
+Then build the example app for both platforms, matching what CI does
+([.github/workflows/main.yml](.github/workflows/main.yml)):
 
-### Main Properties
+```
+cd example && flutter pub get && flutter build apk --debug
+```
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| **`id`** | UUID identifier for each call. UUID should be unique for every call and when the call is ended, the same UUID for that call to be used. Suggest using [uuid](https://pub.dev/packages/uuid). ACCEPT ONLY UUID | Required |
-| **`nameCaller`** | Caller's name | _None_ |
-| **`appName`** | App's name. Used for display inside Callkit (iOS). | App Name, `Deprecated for iOS > 14, default using App name` |
-| **`avatar`** | Avatar's URL used for display for Android. `/android/src/main/res/drawable-xxxhdpi/ic_default_avatar.png` | _None_ |
-| **`handle`** | Phone number/Email/Any | _None_ |
-| **`type`** | 0 - Audio Call, 1 - Video Call | `0` |
-| **`duration`** | Incoming call/Outgoing call display time (second). If the time is over, the call will be missed | `30000` |
-| **`textAccept`** | Text `Accept` used in Android | `Accept` |
-| **`textDecline`** | Text `Decline` used in Android | `Decline` |
-| **`extra`** | Any data added to the event when received | `{}` |
-| **`headers`** | Any data for custom header avatar/background image | `{}` |
-| **`missedCallNotification`** | Android data needed to customize Missed Call Notification | Below |
-| **`callingNotification`** | Android data needed to customize Calling Notification | Below |
-| **`android`** | Android data needed to customize UI | Below |
-| **`ios`** | iOS data needed | Below |
+```
+cd example && flutter build ios --release --no-codesign
+```
 
-### Missed Call Notification
+Finally, check the two fork features by hand on an Android device. This is the part that matters: a
+change of ours dropped during conflict resolution still compiles, so nothing above will catch it.
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| **`subtitle`** | Text `Missed Call` used in Android/iOS (show in missed call notification) | `Missed Call` |
-| **`callbackText`** | Text `Call back` used in Android/iOS (show in missed call notification action) | `Call back` |
-| **`showNotification`** | Show missed call notification when timeout | `true` |
-| **`isShowCallback`** | Show callback action from missed call notification | `true` |
+1. Show an incoming call with a `rippleEffect` set (non-default `color` and `scale` are the easiest
+   to eyeball) and confirm the glow reflects it. `adb logcat -s CallkitIncoming` prints the values
+   `applyRippleSettings()` received.
+2. Show an incoming call with a long caller name and confirm it centers and wraps to up to 3 lines
+   rather than being cut off with an ellipsis.
 
-### Calling Notification
+## What we changed locally
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| **`subtitle`** | Text used in Android (show in calling notification) | `Calling...` |
-| **`callbackText`** | Text used in Android (show in calling notification action) | `Hang Up` |
-| **`showNotification`** | Show calling notification when start call/accept call | `true` |
-| **`isShowCallback`** | Show hang up action from calling notification | `true` |
+Current baseline: upstream `3.1.5` (merge base `8df0558`). To see the full fork diff at any time:
+`git diff upstream/master...HEAD`.
 
-### Android
+### 1. Configurable ripple effect (Android)
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| **`isCustomNotification`** | Using custom notifications | `false` |
-| **`isCustomSmallExNotification`** | Using custom notification small on some devices clipped out in Android | `false` |
-| **`isShowLogo`** | Show logo app inside full screen. `/android/src/main/res/drawable-xxxhdpi/ic_logo.png` | `false` |
-| **`logoUrl`** | Logo app inside full screen. Example: http://... https://... or "assets/abc.png" | _None_ |
-| **`ringtonePath`** | File name of a ringtone ex: `ringtone_default`. Put file into `/android/app/src/main/res/raw/ringtone_default.mp3` | `system_ringtone_default` <br>using ringtone default of the phone |
-| **`backgroundColor`** | Incoming call screen background color | `#0955fa` |
-| **`backgroundUrl`** | Using image background for Incoming call screen. Example: http://... https://... or "assets/abc.png" | _None_ |
-| **`actionColor`** | Color used in button/text on notification | `#4CAF50` |
-| **`textColor`** | Color used for the text in full screen notification | `#ffffff` |
-| **`incomingCallNotificationChannelName`** | Notification channel name of incoming call | `Incoming call` |
-| **`missedCallNotificationChannelName`** | Notification channel name of missed call | `Missed call` |
-| **`isShowCallID`** | Show call id app inside full screen/notification | `false` |
-| **`isShowFullLockedScreen`** | Show full screen on Locked Screen (please make sure call `requestFullIntentPermission` for Android 14+) | `true` |
+Upstream hard-codes the pulsing glow behind the caller avatar on the full-screen incoming call
+screen. We made it configurable from Dart.
 
-### iOS
+| File                                          | Change                                                                                                                                     |
+|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `lib/entities/ripple_effect_params.dart`      | New `RippleEffectParams` entity: `color`, `amount`, `radius`, `scale`, `duration`.                                                         |
+| `lib/entities/ripple_effect_params.g.dart`    | Generated JSON glue (checked in — see [Regenerating serialization code](#regenerating-serialization-code)).                                |
+| `lib/entities/android_params.dart`            | Added the `rippleEffect` field to `AndroidParams`.                                                                                         |
+| `lib/entities/android_params.g.dart`          | Generated glue for the new field.                                                                                                          |
+| `lib/entities/entities.dart`                  | Exports `ripple_effect_params.dart`.                                                                                                       |
+| `android/.../Call.kt`                         | Reads `android["rippleEffect"]` into five flat `ripple*` fields, and carries them through `toBundle()` / `fromBundle()`.                   |
+| `android/.../CallkitConstants.kt`             | Five new `EXTRA_CALLKIT_RIPPLE_*` bundle keys.                                                                                             |
+| `android/.../CallkitIncomingActivity.kt`      | `initView()` now takes the intent `Bundle`, and `applyRippleSettings()` pushes the values into the view *before* `startRippleAnimation()`. |
+| `android/.../widgets/RippleRelativeLayout.kt` | New `updateRippleSettings()` that tears down and rebuilds the ripple views and animators.                                                  |
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| **`iconName`** | App's Icon. Used for display inside Callkit (iOS) | `CallKitLogo` <br> using from `Images.xcassets/CallKitLogo` |
-| **`handleType`** | Type handle call `generic`, `number`, `email`, Recommended to use `generic` for more reasonable callkit display | `generic` |
-| **`supportsVideo`** | | `true` |
-| **`maximumCallGroups`** | | `2` |
-| **`maximumCallsPerCallGroup`** | | `1` |
-| **`audioSessionMode`** | | _None_, `gameChat`, `measurement`, `moviePlayback`, `spokenAudio`, `videoChat`, `videoRecording`, `voiceChat`, `voicePrompt` |
-| **`audioSessionActive`** | | `true` |
-| **`audioSessionPreferredSampleRate`** | | `44100.0` |
-| **`audioSessionPreferredIOBufferDuration`** | | `0.005` |
-| **`supportsDTMF`** | | `true` |
-| **`supportsHolding`** | | `true` |
-| **`supportsGrouping`** | | `true` |
-| **`supportsUngrouping`** | | `true` |
-| **`ringtonePath`** | Add file to root project xcode `/ios/Runner/Ringtone.caf` and Copy Bundle Resources (Build Phases) | `Ringtone.caf`<br>`system_ringtone_default` <br>using ringtone default of the phone |
+Notes for whoever touches this next:
 
-## 📁 Source Code
+- The Dart side sends a **nested map** (`android.rippleEffect.*`); the Kotlin side flattens it into
+  five bundle extras. Both halves have to change together.
+- `applyRippleSettings()` is a no-op when every value equals the Kotlin default
+  (`amount=4`, `radius=60f`, `scale=4.5f`, `duration=3000`, empty color), so an app that sends no
+  `rippleEffect` gets upstream's original animation.
+- `radius` is specified in **dp** from Dart and converted with `Utils.dpToPx()`; `duration` is ms.
+- iOS is unaffected — CallKit renders the incoming screen, so there is nothing to style.
 
-Please checkout repo GitHub:
-- [https://github.com/hiennguyen92/flutter_callkit_incoming](https://github.com/hiennguyen92/flutter_callkit_incoming)
-- [Example](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/lib/main.dart)
+### 2. Full-screen caller-name layout (Android)
 
-## 📱 Pushkit - Received VoIP and Wake App from Terminated State (iOS Only)
+In `android/src/main/res/layout/activity_callkit_incoming.xml` and
+`android/src/main/res/layout-w600dp-land/activity_callkit_incoming.xml`: the caller name is centered
+and wraps to 3 lines instead of being ellipsized to 1, and the portrait layout uses a larger top
+margin (`base_margin_x5`) below the avatar. Both layout variants must stay in sync.
 
-Please check [PUSHKIT.md](https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/PUSHKIT.md) for setup Pushkit for iOS.
+### 3. APNs troubleshooting notes
 
-## 📋 Todo
+[PUSHKIT.md](PUSHKIT.md) has an appended "Integration Guide" section covering `BadDeviceToken`
+(sandbox vs production environment) and `TopicDisallowed` (bundle ID / certificate mismatch).
 
-- [X] Run background / background execution support (implemented via self-managed Telecom service & didActivate background replay cache)
-- [X] Swift Package Manager (SPM) support
-- [ ] Simplify the setup process
-- [X] Custom notification for iOS (Missing notification)
-- [X] Keep notification when calling
+## Working in this repo
 
-## 🎯 Demo
+Almost every file here is upstream's. Keep our diff against upstream as small as possible, so the
+updates above stay mergeable — don't reformat, rename or "tidy" upstream code as a side effect of a
+change. Fork-specific documentation goes in this README; `PUSHKIT.md`, `CHANGELOG.md` and `CMD.md`
+are upstream's.
 
-### Demo Illustration
+The package version in `pubspec.yaml` tracks upstream (currently `3.1.5`) and is **not** bumped for
+fork changes. Our own releases are tagged separately — see the `v3.0.0-gl.1` style tags.
 
-### Images
+## Remotes
 
-<table>
-  <tr>
-    <td><strong>iOS (Lockscreen)</strong></td>
-    <td><strong>iOS (Full Screen)</strong></td>
-    <td><strong>iOS (Alert)</strong></td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image1.png" width="220" alt="iOS Lockscreen">
-    </td>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image2.png" width="220" alt="iOS Full Screen">
-    </td>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image3.png" width="220" alt="iOS Alert">
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Android (Lockscreen) - Audio</strong></td>
-    <td><strong>Android (Alert) - Audio</strong></td>
-    <td><strong>Android (Lockscreen) - Video</strong></td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image4.jpg" width="220" alt="Android Lockscreen Audio">
-    </td>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image5.jpg" width="220" alt="Android Alert Audio">
-    </td>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image6.jpg" width="220" alt="Android Lockscreen Video">
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Android (Alert) - Video</strong></td>
-    <td><strong>isCustomNotification: false</strong></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image7.jpg" width="220" alt="Android Alert Video">
-    </td>
-    <td>
-      <img src="https://raw.githubusercontent.com/hiennguyen92/flutter_callkit_incoming/master/images/image8.jpg" width="220" alt="Custom Notification False">
-    </td>
-    <td></td>
-  </tr>
-</table> 
+| Remote     | URL                                                                  | Role                                                       |
+|------------|----------------------------------------------------------------------|------------------------------------------------------------|
+| `origin`   | `https://github.com/globalline-network/flutter_callkit_incoming.git` | Our fork. `master` is the branch consuming apps depend on. |
+| `upstream` | `https://github.com/hiennguyen92/flutter_callkit_incoming.git`       | Read-only. Source of new releases.                         |
+
+A fresh clone only has `origin`. If GitHub recognises this repo as a fork of hiennguyen92's, clients
+pick `upstream` up on their own and nothing needs doing.
+
+Otherwise it has to be added by hand, named exactly `upstream` and pointing at the URL above.
+**GitHub Desktop has no UI for adding a second remote** — its Repository settings dialog only edits
+`origin`. So either add it from a terminal once, or use a client that manages remotes (Fork,
+GitKraken, VS Code, Sourcetree). It's one-time per clone, so a terminal is usually quickest:
+
+```
+git remote add upstream https://github.com/hiennguyen92/flutter_callkit_incoming.git
+```
+
+## Regenerating serialization code
+
+`lib/entities/*.g.dart` are `json_serializable` output and are **committed** — consuming apps get
+this package as a git dependency, so they have to be in the tree.
+
+```
+dart run build_runner build --delete-conflicting-outputs
+```
+
+Run it after any change to an entity class, and after any upstream merge that touched
+`lib/entities/`. Commit the regenerated files; a `.g.dart` that disagrees with its source is a
+silent
+runtime bug, not a build error.
