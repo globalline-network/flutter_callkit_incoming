@@ -6,7 +6,7 @@
 > Installation, usage and the full parameter reference live in upstream's docs — their
 > [README](https://github.com/hiennguyen92/flutter_callkit_incoming#readme) or
 > [pub.dev](https://pub.dev/packages/flutter_callkit_incoming) — bearing in mind both track
-> upstream's latest release, not this fork's baseline (currently `3.1.5`). iOS VoIP setup is in
+> upstream's latest release, not this fork's baseline (currently `3.1.6`). iOS VoIP setup is in
 > [PUSHKIT.md](PUSHKIT.md) — upstream's guide, with our APNs troubleshooting notes appended at the
 > end.
 
@@ -103,7 +103,7 @@ change of ours dropped during conflict resolution still compiles, so nothing abo
 
 ## What we changed locally
 
-Current baseline: upstream `3.1.5` (merge base `8df0558`). To see the full fork diff at any time:
+Current baseline: upstream `3.1.6` (merge base `27cd33c`). To see the full fork diff at any time:
 `git diff upstream/master...HEAD`.
 
 ### 1. Configurable ripple effect (Android)
@@ -149,10 +149,10 @@ margin (`base_margin_x5`) below the avatar. Both layout variants must stay in sy
 
 Almost every file here is upstream's. Keep our diff against upstream as small as possible, so the
 updates above stay mergeable — don't reformat, rename or "tidy" upstream code as a side effect of a
-change. Fork-specific documentation goes in this README; `PUSHKIT.md`, `CHANGELOG.md` and `CMD.md`
+change. Fork-specific documentation goes in this README; `PUSHKIT.md` and `CHANGELOG.md`
 are upstream's.
 
-The package version in `pubspec.yaml` tracks upstream (currently `3.1.5`) and is **not** bumped for
+The package version in `pubspec.yaml` tracks upstream (currently `3.1.6`) and is **not** bumped for
 fork changes. Our own releases are tagged separately — see the `v3.0.0-gl.1` style tags.
 
 ## Remotes

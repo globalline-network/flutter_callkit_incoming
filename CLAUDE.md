@@ -15,11 +15,11 @@ merge, and known gaps. Two facts that change how you should edit:
 - Almost every file here is **upstream-owned**. Keep diffs against upstream minimal so updates stay
   mergeable. Don't reformat, rename, or "tidy" upstream code as a side effect of a change.
 - `README.md` is ours — upstream's package README was replaced by fork documentation, so upstream's
-  installation and usage docs now live only on upstream/pub.dev. `PUSHKIT.md`, `CHANGELOG.md` and
-  `CMD.md` are still upstream's; editing them creates merge conflicts for no benefit (`PUSHKIT.md`
+  installation and usage docs now live only on upstream/pub.dev. `PUSHKIT.md` and `CHANGELOG.md`
+  are still upstream's; editing them creates merge conflicts for no benefit (`PUSHKIT.md`
   already carries one appended section of ours).
 
-Remotes: `origin` = the fork, `upstream` = hiennguyen92. Current baseline: upstream `3.1.5`.
+Remotes: `origin` = the fork, `upstream` = hiennguyen92. Current baseline: upstream `3.1.6`.
 
 ## Layout
 
@@ -57,7 +57,7 @@ cd example && flutter build apk --debug
 cd example && flutter build ios --release --no-codesign
 ```
 
-Do **not** run `flutter pub publish`. The `CMD.md` publish commands are upstream's; this fork is
+Do **not** run `flutter pub publish`. This fork is
 consumed as a git dependency. See [README.md](README.md#dont-publish-to-pubdev).
 
 ## Conventions and gotchas
